@@ -5,9 +5,8 @@
 </head>
 <body>
 <script src="jquery-2.0.3.js"></script>
-<script src="18xx.js"></script>
 <div id="actors">
-<table id="actor" boarder="1">
+<table id="actor" border="1">
 <tr>
   <th><b>Name</b></th>
   <td id="add_actor">
@@ -23,11 +22,15 @@
   <th><b>Cash</b></th>
   <td id="add_cash" hidden>
 </tr>
+<tr>
+  <th><b>Income</b></th>
+  <td id="add_income" hidden>
+</tr>
 </table>
 <button onClick="startgame()">Start</button>
 </div>
 <div id="market">
-<table>
+<table id="co_actor" border="1">
 <tr>
   <th><b>Company</b></th>
   <td id="market_actor" hidden>
@@ -44,48 +47,51 @@
   <th><b>Cash</b></th>
   <td id="market_cash" hidden>
 </tr>
+<tr>
+  <th><b>Income</b></th>
+  <td id="market_income" hidden>
+</tr>
 </table>
 </div>
 <div id="board">
 </div>
 <div id="log">
-<ul id="log_turns">
+<ul id="log_turns" class="log_turns">
 </ul>
 </div>
 <div id="actions">
-<ul>
-<li id="sr_actions" hidden>
+<div id="sr_actions" hidden>
   <div id="sr_id">sr1</div> <div id="current_player">asdf</div>
   <ul>
       <li>
-        <button onclick="sr_sell()">Sell</button> <input width=2 name="sell_share"> shares of <select class="sr_co_list" name="sell_co"></select>.<br>
+        <button onclick="sr_sell()">Sell</button> <input width=2 id="sell_share"> shares of <select class="sr_co_list" id="sell_co"></select>.<br>
       </li>
       <li>
-        <button onclick="sr_ipo()">IPO</button> <select class="ipo_shares"></select> shares of <select class="share_co_names" name="ipo_co"></select> for $<input name="ipo_price">.<br>
+        <button onclick="sr_ipo()">IPO</button> <select class="ipo_shares"></select> shares of <select class="share_co_names" id="ipo_co"></select> for $<input id="ipo_price">.<br>
       </li>
       <li>
-        <button onclick="sr_buy()">Buy</button> <input width=2 name="buy_share"> shares of <select class="sr_co_list" name="buy_co"></select>.<br>
+        <button onclick="sr_buy()">Buy</button> <input width=2 id="buy_share"> shares of <select class="sr_co_list" id="buy_co"></select>.<br>
       </li>
       <li>
         <button onclick="sr_pass()">Pass.</button><br>
       </li>
   </ul>
-</li>
-<li id="or_actions" hidden>
+</div>
+<div id="or_actions" hidden>
   <div id="or_id">or1.1</div> <div id="current_co">asdf</div>
   <ul>
       <li>
-        <button onclick="or_operate()">Operate</button> for $<input width=2 name="op_run">.<br>
+        <button onclick="or_operate()">Operate</button> for $<input width=2 id="op_run">.<br>
       </li>
       <li>
-        <button onclick="or_buy()">Pay</button> $<input width=2 name="op_pay"> to <select class="or_actor_list" name="or_payto"></select> for <input name="or_pay_why">.<br>
+        <button onclick="or_buy()">Pay</button> $<input width=2 id="op_pay"> to <select class="or_actor_list" id="or_payto"></select> for <input id="or_pay_why">.<br>
       </li>
       <li>
         <button onclick="or_pass()">Pass.</button><br>
       </li>
   </ul>
-</li>
-</ul>
 </div>
+</div>
+<script src="18xx.js"></script>
 </body>
 </html>
