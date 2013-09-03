@@ -3,7 +3,7 @@ var game_cfg = {
     bank: [0,0,0,6000, 5000, 4000],
     paper_limit: [0,0,0,14, 13, 12],
     minors: [{name:'a',cash:60},{name:'b',cash:60}],
-    stock_co: [{name:'Z'},{name:'X'},{name:'C'},{name:'V'}],
+    share_co: [{name:'Z'},{name:'X'},{name:'C'},{name:'V'}],
     eat_comma: 0
 };
 
@@ -108,8 +108,8 @@ function startgame()
     for(c in game_cfg.minors) {
         new_minor(game_cfg.minors[c]);
     }
-    for(c in game_cfg.stock_co) {
-        $(".share_co_names").append("<option value="+c+">"+game_cfg.stock_co[c].name+"</option>");
+    for(c in game_cfg.share_co) {
+        $(".share_co_names").append("<option value="+c+">"+game_cfg.share_co[c].name+"</option>");
     }
     for(c in game.players) {
         player_cash(c, game_cfg.player_start_cash[game.players.length]);
@@ -125,7 +125,7 @@ function buy_share(player_no, count, share_of, from_where)
 {
     var cost;
     // from_where 0=ipo, 1=market, 2=company
-    // player_no is <0 then is a stock_co
+    // player_no is <0 then is a share_co
     if (from_where == 0) {
         game.share_co[share_of].ipo -= count;
         cost = count*game.share_co[share_of].par;
@@ -152,13 +152,15 @@ function sr_sell()
 
 function sr_ipo()
 {
-    var n, par, s;
+    var n, par, s, h;
     n = $('#ipo_co').val();
     par = +$('#ipo_price').val();
     s = +$('#ipo_shares').val();
     s = 10;
-    new_share_co({name: n, par:par, stock:par, shares:s, ipo:s});
+    new_share_co({name: game_cfg.share_co[n].name, par:par, stock:par, shares:s, ipo:s});
     buy_share(game.sr_current, 2, n, 0);
+    h = "IPO: -- "+game.share_co[n].name+" with "+s+" shares, par at $"+par+" by "+game.players[game.sr_current].name;
+    $("#log_sr_"+game.turn_id).append($("<li/>", { class: 'log_action', html: h }));
 }
 
 function sr_buy()
@@ -310,7 +312,7 @@ function or_in_log()
         h += game.share_co[p].name+": $"+i+" ";
         share_co_cash(p, +i);
     }
-    $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action', id:"log_sr"+game.turn_id, html: h }));
+    $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action', html: h }));
 }
 
 // UI functions
