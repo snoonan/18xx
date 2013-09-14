@@ -43,7 +43,7 @@ function addplayer() {
             html: "$<input size='3' id="+name+"_in>",
             id: name+"_income",
     }).insertBefore("#add_income");
-    $(".or_payto").append("<option value=p"+(game.players.length-1)+">"+name+"</option>");
+    $(".or_actor_list").append("<option value=p"+(game.players.length-1)+">"+name+"</option>");
 }
 
 function new_minor(m)
@@ -72,6 +72,7 @@ function new_minor(m)
     $( "<td/>", {
             html: "-",
     }).insertBefore("#market_income");
+    $(".or_actor_list").append("<option value=m"+(game.minors.length-1)+">"+m.name+"</option>");
 }
 
 function new_share_co(s)
@@ -98,7 +99,9 @@ function new_share_co(s)
             html: "$<input size='3' id="+name+"_in>",
             id: name+"_income",
     }).insertBefore("#market_income");
-    $(".or_payto").append("<option value=s"+(game.share_co.length-1)+">"+name+"</option>");
+    // Remove from share_co_names
+    //$(".or_actor_list").append("<option value=s"+(game.share_co.length-1)+">"+s.name+"</option>");
+    $(".or_actor_list").append("<option value=s"+(game.share_co.length-1)+">"+s.name+"</option>");
 }
 
 function startgame()
@@ -194,6 +197,7 @@ function sr_start()
     sr_log();
     $('#actions>div').hide()
     $("#sr_actions").show()
+    $("#special_actions").show()
 }
 
 function or_pass()
@@ -229,6 +233,7 @@ function or_start()
     or_in_log();
     $('#actions>div').hide()
     $("#or_actions").show()
+    $("#special_actions").show()
 }
 
 // Table maintainence
