@@ -27,7 +27,7 @@ var game  = {
 
 function addplayer() {
     name = $("#actor_name").val();
-    game.players.push({name: name, nw: 0, cash: 0, shares: []})
+    game.players.push({name: name, nw: 0, cash: 0, shares: {}, shares_pct:{}});
     game.actors['p'+game.players.length-1] = game.players[game.players.length-1];
     $( "<td/>", {
             html: name,
@@ -161,41 +161,43 @@ function buy_share(player_no, share, share_of, from_where)
     // from_where 0=ipo/company, 1=market
     // player_no is <0 then is a share_co
     if (from_where == 0) {
-        share_idx = game.share_co[share_of].shares.indexOf(share);
+        share_idx = game.share_co[share_of].shares[share_of].indexOf(share);
         if (share_idx == -1) {
             return;
         }
-        game.share_co[share_of].shares.splice(share_idx,1);
+        game.share_co[share_of].shares[share_of] = 
+        game.share_co[share_of].shares[share_of].slice(0,share_idx) +
+        game.share_co[share_of].shares[share_of].slice(share_idx+1,game.share_co[share_of].shares[share_of].length);
         if (game_cfg.fullcap) {
-            cost = share_val(share)*game.share_co[share_of].par;
+            cost = share_value(share)*game.share_co[share_of].par;
         } else {
-            cost = share_val(share)*game.share_co[share_of].stock;
+            cost = share_value(share)*game.share_co[share_of].stock;
         }
-        $('#'+game.share_co[share_of].name+'_ipo').html(game.share_co[share_of].par+":"+game.share_co[share_of].shares[s.name]);
+        $('#'+game.share_co[share_of].name+'_ipo').html(game.share_co[share_of].par+":"+game.share_co[share_of].shares[share_of]);
     } else if (from_where == 1) {
         share_idx = game.share_co[share_of].market.indexOf(share);
         if (share_idx == -1) {
             return;
         }
         game.share_co[share_of].market.splice(share_idx,1);
-        cost = share_val(share)*game.share_co[share_of].stock;
+        cost = share_value(share)*game.share_co[share_of].stock;
         $('#'+game.share_co[share_of].name+'_market').html(game.share_co[share_of].par+":"+game.share_co[share_of].shares[s.name]);
     }
     if (player_no >= 0) {
         if (!game.players[player_no].shares.hasOwnProperty(share_of)) {
-            game.players[player_no].shares[share_of] = {}
+            game.players[player_no].shares[share_of] = ''
             game.players[player_no].shares_pct[share_of] = 0;
         }
-        game.players[player_no].shares[share_of].append(share);
+        game.players[player_no].shares[share_of] += share;
         game.players[player_no].shares_pct[share_of] += game.share_co[share_of].share_count*share_value(share);
         actor_cash(game.players[player_no], -cost);
         player_nw(player_no);
     } else {
         if (!game.share_co[(-player_no) -1].shares.hasOwnProperty(share_of)) {
-            game.share_co[(-player_no) -1].shares[share_of] = {}
+            game.share_co[(-player_no) -1].shares[share_of] = ''
             game.share_co[(-player_no) -1].shares_pct[share_of] = 0;
         }
-        game.share_co[(-player_no) - 1].shares[share_of].append(share);
+        game.share_co[(-player_no) - 1].shares[share_of] += share;
         game.share_co[(-player_no) - 1].shares_pct[share_of] += game.share_co[share_of].share_count*share_value(share);
         actor_cash(game.share_co[p], -cost);
     }
@@ -215,11 +217,11 @@ function sr_ipo()
     s_idx = 0;
     co_shares = game_cfg.shares[s_idx];
 
-    new_co = {name: game_cfg.share_co[n].name, par:par, stock:par, shares:{}};
-    new_co.shares[game_cfg.share_co[n].name] = co_shares;
+    new_co = {name: game_cfg.share_co[n].name, par:par, stock:par, shares:{}, shares_pct: {}};
+    new_co.shares[game.share_co.length] = co_shares;
     new_share_co(new_co);
-    buy_share(game.sr_current, 'p', game.share_co[n].name, 0);
-    h = "IPO: -- "+game.share_co[n].name+" with "+s+" shares, par at $"+par+" by "+game.players[game.sr_current].name;
+    buy_share(game.sr_current, 'p', game.share_co.length-1, 0);
+    h = "IPO: -- "+new_co.name+" with "+s+" shares, par at $"+par+" by "+game.players[game.sr_current].name;
     $("#log_sr_"+game.turn_id).append($("<li/>", { class: 'log_action', html: h }));
 }
 
@@ -351,11 +353,13 @@ function actor_cash(a, c)
 // p = player index
 function player_nw(p)
 {
-  var nw, s;
+  var nw, c, s;
 
   nw = game.players[p].cash;
-  for(s in game.players[p].co_stock) {
-    nw += game.share_co[s].stock * game.players[p].co_stock[s];
+  for(c in game.players[p].shares) {
+    for(s = 0; s < game.players[p].shares[c].length; s++) {
+      nw += game.share_co[c].stock * share_value(game.players[p].shares[c].charAt(s));
+    }
   }
   game.players[p].nw = nw;
   $("#"+game.players[p].name+"_nw").text(game.players[p].nw);
