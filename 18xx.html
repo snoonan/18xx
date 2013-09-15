@@ -39,6 +39,10 @@
   <th><b>Share price</b></th>
   <td id="market_valuation" hidden>
 </tr>
+<tr id="ipo">
+  <th><b>IPO</b></th>
+  <td id="market_ipo" hidden>
+</tr>
 <tr>
   <th><b>Last run</b></th>
   <td id="market_run" hidden>
@@ -84,13 +88,13 @@
         <button onclick="or_operate()">Operate</button> for $<input width=2 id="op_run">.<br>
       </li>
       <li>
-        <button onclick="or_pay()">Pay</button> $<input width=2 id="or_pay"> to <select class="or_actor_list" id="or_payto"></select> for <input id="or_pay_why">.<br>
+        <button onclick="or_pay()">Pay</button> $<input width=2 id="or_pay"> to <select class="or_actor_list" id="or_pay_to"><option value='b'>Bank</option></select> for <input id="or_pay_why">.<br>
       </li>
       <li>
-        <button onclick="or_buy()">Buyback</button> $<input width=2 id="or_buy"> to buy back <inputi width=2 id="or_buy_shares"> shares back.<br>
+        <button onclick="or_buy()">Buyback</button> $<input width=2 id="or_buy"> to buy back <input width=2 id="or_buy_shares"> shares back.<br>
       </li>
       <li>
-        <button onclick="or_sell()">Sell</button> $<input width=2 id="or_sell"> from selling <inputi width=2 id="or_sell"> shares to the market.<br>
+        <button onclick="or_sell()">Sell</button> $<input width=2 id="or_sell"> from selling <input width=2 id="or_sell_shares"> shares to the market.<br>
       </li>
       <li>
         <button onclick="or_pass()">Pass.</button><br>
@@ -101,7 +105,10 @@
   <ul>
       <li>
         <button onclick="sp_pay()">Pay</button> $<input width=2 id="sp_pay"> from <select class="or_actor_list" id="sp_pay_from"><option value='b'>Bank</option></select> to <select class="or_actor_list" id="sp_pay_to"><option value='b'>Bank</option></select> for <input id="sp_pay_why">.<br>
-        <button onclick="sp_pay()">Stock</button> <input width=2 id="sp_share"> of <select class="sr_co_list" id="sp_share_co"> from <select class="or_actor_list" id="sp_share_from"><option value='b'>Bank</option></select> to <select class="or_actor_list" id="sp_share_to"><option value='b'>Bank</option></select> for <input id="sp_share_why">.<br>
+      </li>
+      <li>
+        <button onclick="sp_stock()">Stock</button> <input width=2 id="sp_share"> of <select class="sr_co_list" id="sp_share_co"> from <select class="or_actor_list" id="sp_share_from"><option value='b'>Bank</option></select> to <select class="or_actor_list" id="sp_share_to"><option value='b'>Bank</option></select> for <input id="sp_share_why">.<br>
+      </li>
   </ul>
 </div>
 </div>
