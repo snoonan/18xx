@@ -58,6 +58,7 @@ function new_minor(m)
 {
     m.type = 'm';
     m.id = 'm'+game.minors.length;
+    m.cash = +m.cash;
     game.minors.push(m);
     game.actors['m'+(game.minors.length-1)] = game.minors[game.minors.length-1];
     $( "<td/>", {
@@ -95,6 +96,7 @@ function new_share_co(s)
 {
     s.type = 's';
     s.id = 's'+game.share_co.length;
+    s.cash = +s.cash;
     game.share_co.push(s);
     game.actors['s'+(game.share_co.length-1)] = game.share_co[game.share_co.length-1];
     $( "<td/>", {
@@ -146,6 +148,7 @@ function startgame()
         $(".share_co_names").append("<option class='s_"+game_cfg.share_co[c].name+"' value="+c+">"+game_cfg.share_co[c].name+"</option>");
     }
     for(c in game.players) {
+        game.players[c].cash = 0;
         transfer_cash(game.market,game.players[c], game_cfg.player_start_cash[game.players.length]);
     }
     $("#Bank_actor").html('Bank');
@@ -259,11 +262,13 @@ function update_stock_ui(actor)
 
 function sr_sell()
 {
-    var n, price, share;
+    var n, price, shares;;
     n = $('#sr_sell_co').val();
-    share = $('#sr_sell_share').val();
-    transfer_share(game.players[game.sr_current], game.market, share, n, game.actors[n].stock);
-    h = "Sell: -- "+game.players[game.sr_current].name+" sold a "+share_type(share)+" share to the market for $"+game.share_co[n].stock*share_value(share);
+    $('#sr_buy_shares').val();
+    for(var share in shares) {
+        transfer_share(game.players[game.sr_current], game.market, shares.charAt(share), n, game.actors[n].stock);
+    }
+    h = "Sell: -- "+game.players[game.sr_current].name+" sold "+$('#sr_buy_shares').val()+" share to the market for $"+game.share_co[n].stock*share_value(share);
     $("#log_sr_"+game.turn_id).append($("<li/>", { class: 'log_action', html: h }));
     game.sr_passes = 0;
 }
@@ -338,14 +343,14 @@ function or_operate()
     var h, pay, per_share;
     h = "Operate: -- ";
     pay = $('#or_run_pay').val();
-    per_share = +($('#or_run_value').val()/game.or_actor.share_count);
+    per_share = Math.floor(+($('#or_run_value').val()/game.or_actor.share_count));
     h += game.or_actor.name+" operated for $"+per_share+' per share ';
     if (pay == 'full') {
         h += 'paying out';
     } else if (pay == 'half') {
         h += 'paying half';
         transfer_cash(game.market, game.or_actor, +$('#or_run_value').val()/2);
-        per_share = (per_share+1)/2;
+        per_share = Math.floor((per_share+1)/2);
     } else {
         h += 'holding';
         per_share = 0;
@@ -374,7 +379,7 @@ function or_pay()
       transfer_cash(game.or_actor,market, $('#or_pay').val());
     }
     h += game.or_actor.name+" payed $"+$('#or_pay').val();
-    h += " to "+game.actor[$('#or_pay_to').val()].name;
+    h += " to "+game.actors[$('#or_pay_to').val()].name;
     h += " for "+$('#or_pay_why').val()
 
     $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action special', html: h }));
@@ -382,22 +387,30 @@ function or_pay()
 
 function or_buy()
 {
-    var h;
+    var h, shares;
     h = "Buyback: -- ";
-    transfer_cash(game.or_actor, game.market, -$('#or_buy').val());
+    transfer_cash(game.or_actor, game.market, +$('#or_buy').val());
+    shares = $('#or_buy_shares').val();
+    for(var share in shares) {
+        transfer_share(game.market, game.or_actor, shares.charAt(share), game.or_actor.id, 0);
+    }
     h += game.or_actor.name+" payed $"+$('#or_buy').val();
-    h += " for "+$('#or_buy_shares').val()+" of stock back from the market.";
+    h += " for "+shares+" of stock back from the market.";
 
     $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action special', html: h }));
 }
 
 function or_sell()
 {
-    var h;
+    var h, shares;
     h = "Stock sell: -- ";
-    transfer_cash(game.market, game.or_actor, $('#or_sell').val());
+    shares = $('#or_sell_shares').val();
+    transfer_cash(game.market, game.or_actor, +$('#or_sell').val());
+    for(var share in shares) {
+        transfer_share(game.or_actor, game.market, shares.charAt(share), game.or_actor.id, 0);
+    }
     h += game.or_actor.name+" was payed $"+$('#or_sell').val();
-    h += " for "+$('#or_sell_shares').val()+" of stock into the market.";
+    h += " for "+shares+" of stock into the market.";
 
     $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action special', html: h }));
 }
@@ -524,11 +537,11 @@ function sp_pay()
 {
     var h;
     h = "Special payment: -- ";
-    transfer_cash(game.actor[$('#sp_pay_from').val()],
-                  game.actor[$('#sp_pay_to').val()],
+    transfer_cash(game.actors[$('#sp_pay_from').val()],
+                  game.actors[$('#sp_pay_to').val()],
                   $('#sp_pay').val());
-    h += game.actor[$('#sp_pay_from').val()].name+" payed $"+$('#sp_pay').val();
-    h += " to "+game.actor[$('#sp_pay_to').val()].name;
+    h += game.actors[$('#sp_pay_from').val()].name+" payed $"+$('#sp_pay').val();
+    h += " to "+game.actors[$('#sp_pay_to').val()].name;
     h += " for "+$('#sp_pay_why').val()
 
     $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action special', html: h }));
