@@ -23,3 +23,12 @@
     font-weight: normal;
     cursor: pointer;
 }
+.ipo {
+    border-color:red
+}
+.red {
+    background:red
+}
+.yellow {
+    background:yellow
+}
