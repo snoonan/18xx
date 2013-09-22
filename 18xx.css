@@ -32,3 +32,9 @@
 .yellow {
     background:yellow
 }
+.stock_rising {
+    color:green
+}
+.stock_falling {
+    color:blue
+}

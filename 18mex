@@ -1,0 +1,42 @@
+var game_cfg = {
+    player_start_cash: [0,0,0,625, 500, 450],
+    bank: [0,0,0,6000, 5000, 4000],
+    paper_limit: [0,0,0,19, 43, 11],
+    minors: [
+        {name:'a Interoceanic',cash:0, share_count:2, shares: {m0:'ss'}},
+        {name:'b Sonora-baja',cash:0, share_count:2, shares: {m1:'ss'}},
+        {name:'c Southeastern',cash:0, share_count:2, shares: {m2:'ss'}}
+    ],
+    share_co: [
+        {name:'TexMex'},
+        {name:'FCP'},
+        {name:'NdM'},
+        {name:'UdY'},
+        {name:'Mex'},
+        {name:'MexCentral'},
+        {name:'SoPac'},
+        {name:'Chihuahua'}
+    ],
+    shares: ['pssssssss'],
+    share_count: [10],
+    market: {
+        grid:[
+           [60,65,70,75,80,90,100,110,120,130,140,150,165,180,200],
+           [55,60,65,70,75,80,90,100,110,120,130,140,150,165,180],
+           [50,55,60,65,70,75,80,90,100,110,120,130,140,150],
+           [45,50,55,60,65,70,75,80,90,100,110,120],
+           [40,45,50,55,60,65,70,75,80],
+           [30,40,45,50,55],
+           [20,30,40,45,50],
+           [10]
+        ],
+        ipo: [[4,0],[5,0],[3,1],[4,1],[2,2]],
+        yellow: [
+           [0,4],
+           [0,5],[1,5],[2,5],[3,5],[4,5],
+           [0,6],[1,6],[2,6],[3,6],[4,6],
+           [0,7]
+        ]
+    },
+    eat_comma: 0
+};

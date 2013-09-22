@@ -31,6 +31,7 @@
   <td id="Bank_income" hidden>
 </tr>
 </table>
+<input id="game_file" value='18mex'>
 <button id='start' onClick="startgame()">Start</button>
 </div>
 <div id="market">
@@ -118,7 +119,7 @@
         <button onclick="sp_stock()">Stock</button> <input width=2 id="sp_share"> of <select class="sr_co_list" id="sp_share_co"></select> from <select class="or_actor_list" id="sp_share_from"><option value='b'>Bank</option></select> to <select class="or_actor_list" id="sp_share_to"><option value='b'>Bank</option></select> for <input id="sp_share_why">.<br>
       </li>
       <li>
-        <button onclick="sp_stock_adj()">Revalue</button> <select class="sr_co_list" id="sp_adj_co"></select> move <select class="sp_move_list" id="sp_adj_move"><option value='1_0'>Right</option><option value='-1_0'>Left</option><option value='2_0'>Right 2</option><option value='3_0'>Right 3</option><option value='0_1'>Up</option><option value='0_-1'>Down</option></select> for <input id="sp_adj_why">.<br>
+        <button onclick="sp_stock_adj()">Revalue</button> <select class="sr_co_list" id="sp_adj_co"></select> move <select class="sp_move_list" id="sp_adj_move"><option value='1_0'>Right</option><option value='-1_0'>Left</option><option value='2_0'>Right 2</option><option value='3_0'>Right 3</option><option value='0_-1'>Up</option><option value='0_1'>Down</option></select> for <input id="sp_adj_why">.<br>
       </li>
   </ul>
 </div>

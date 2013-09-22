@@ -1,18 +1,3 @@
-var game_cfg = {
-    player_start_cash: [0,900,0,600, 500, 400],
-    bank: [0,10000,0,6000, 5000, 4000],
-    paper_limit: [0,10,0,14, 13, 12],
-    minors: [{name:'a',cash:60, share_count:2, shares: {m0:'ss'}},{name:'b',cash:60, share_count:2, shares: {m1:'ss'}}],
-    share_co: [{name:'Z'},{name:'X'},{name:'C'},{name:'V'}],
-    shares: ['pssssssss'],
-    share_count: [10],
-    market: {
-        grid:[[0,10,20,30,40,50,60,70,80,90,100,112,124,137,150,185,195,212,230,250,270,295,320,345,275,405,440,475,510,550]],
-        ipo: [[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0]]
-    },
-    eat_comma: 0
-};
-
 var game  = {
     players: [],
     minors:  [],
@@ -22,7 +7,7 @@ var game  = {
     or_max: 2,
     turn_id: 1,
     or_id: 1,
-    or_current: 0,
+    or_order: [],
     sr_current: 0,
     sr_passes: 0,
     eat_comma: 0
@@ -98,11 +83,25 @@ function new_minor(m)
 
 function move_in_market(s,x,y)
 {
-    var mark;
+    var mark, move_direction;
+    if (x > 0 || (x == 0 && y < 0)) {
+        move_direction = 'stock_rising';
+    } else {
+        move_direction = 'stock_falling';
+    }
+    game.or_order_market[s.market_loc[1]][s.market_loc[0]].splice(game.or_order_market[s.market_loc[1]][s.market_loc[0]].indexOf(s.id),1);
     s.market_loc[0] += x;
     s.market_loc[1] += y;
-    mark = $('#'+s.name+'_stock_token');
+    game.or_order_market[s.market_loc[1]][s.market_loc[0]].push(s.id);
+    mark = $('#'+s.id+'_stock_token')
+       .addClass(move_direction);
     $('#'+s.market_loc[0]+'_'+s.market_loc[1]).append(mark);
+    $('#'+s.name+'_valuation')
+       .text(game_cfg.market.grid[s.market_loc[1]][s.market_loc[0]]);
+    // Adjust new worth for stock change.
+    for(var from in game.players) {
+        player_nw(from);
+    }
 }
 
 function new_share_co(s)
@@ -116,17 +115,18 @@ function new_share_co(s)
         var ipo = game_cfg.market.ipo[i];
         if (game_cfg.market.grid[ipo[1]][ipo[0]] == s.par) {
             s.market_loc=[ipo[0],ipo[1]];
-            $('#'+ipo[0]+'_'+ipo[1]).append("<div id='"+s.name+"_stock_token'>"+s.name+"</div>");
+            $('#'+ipo[0]+'_'+ipo[1]).append("<div id='"+s.id+"_stock_token'>"+s.name+"</div>");
+            game.or_order_market[s.market_loc[1]][s.market_loc[0]].push(s.id);
         }
     }
     $( "<td/>", {
             html: s.name,
-            id: name+"_name",
+            id: s.name+"_name",
             "class": "co_"+s.share_count+"_stock"
     }).insertBefore("#market_actor");
     $( "<td/>", {
             html: s.stock,
-            id: name+"_valuation",
+            id: s.name+"_valuation",
             "class": "co_"+s.share_count+"_stock"
     }).insertBefore("#market_valuation");
     $( "<td/>", {
@@ -157,9 +157,11 @@ function new_share_co(s)
 
 function startgame()
 {
+    $('#start').hide();
+    $.getScript($('#game_file').val(), function(){
+
     var c;
 
-    $('#start').hide();
     for(var r in game_cfg.market.grid) {
         var row;
         row = $("<tr/>");
@@ -202,7 +204,38 @@ function startgame()
     $('#Bank_cash').show();
     $('#Bank_stock').show();
     game.turn_id = 0;
+    // Cache market operating order.
+    game.or_sort = [];
+    game.or_order_market = [];
+    {
+        var market = [], max; // m[r] = [c,$]
+        for(var r in game_cfg.market.grid) {
+            market[r] = [game_cfg.market.grid[r].length-1, game_cfg.market.grid[r][game_cfg.market.grid[r].length-1]];
+            game.or_order_market[r] = [];
+            game.or_order_market[r][game_cfg.market.grid[r].length-1] = [];
+        }
+        do {
+            max = [99,0,0];     // r,c,$
+            for(var r in market) {
+                if ((market[r][1] > max[2]) || (market[r][1] == max[2] && r > max[0] && market[r][0] > max[1])) {
+                    max = [r,market[r][0],market[r][1]];
+                }
+            }
+            if (max[0] == 99)
+            {
+                continue;
+            }
+            game.or_sort.push([max[0],max[1]]);
+            if (max[1] == 0) {
+                market[max[0]] = [0,-1];
+            } else {
+                market[max[0]] = [max[1]-1, game_cfg.market.grid[max[0]][max[1]-1]];
+                game.or_order_market[max[0]][max[1]] = [];
+            }
+        } while(max[0] != 99);
+    }
     sr_start();
+});
 }
 
 function share_type(share_type)
@@ -465,32 +498,33 @@ function or_sell()
 
 function or_pass()
 {
-    var id = game.or_current;
-    var actor = "minors";
-
-    if (id >= game.minors.length) {
-        id -= game.minors.length;
-        actor = "share_co";
+    if ( game.or_order.length == 0) {
+       if ( game.or_id > game.or_max) {
+           sr_start();
+       } else {
+           or_start();
+       }
+       return;
     }
-    if (actor == "share_co" && id == game.share_co.length)
-    {
-        if ( game.or_id > game.or_max) {
-            sr_start();
-        } else {
-            or_start();
-        }
-        return;
-    }
-    $("#current_co").text(game[actor][id]['name']);
-    game.or_actor = game[actor][id];
-    game.or_current ++;
+    game.or_actor = game.actors[game.or_order.shift()];
+    $("#current_co").text(game.or_actor.name);
 }
 
 function or_start()
 {
+    game.or_order = [];
+    for (var m in game.minors) {
+        game.or_order.push(game.minors[m].id);
+    }
+    for(var i in game.or_sort) {
+        for(var s in game.or_order_market[game.or_sort[i][0]][game.or_sort[i][1]]) {
+            game.or_order.push(game.or_order_market[game.or_sort[i][0]][game.or_sort[i][1]][s]);
+        }
+    }
     game.or_id ++;
-    game.or_current = 0;
     $("#or_id").text('or'+game.turn_id+"."+game.or_id);
+    $('.stock_rising').removeClass('stock_rising');
+    $('.stock_falling').removeClass('stock_falling');
     game.mode='o';
     or_pass();
     or_log();
