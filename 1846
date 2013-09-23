@@ -1,0 +1,27 @@
+var game_cfg = {
+    player_start_cash: [0,0,0,625, 500, 450],
+    bank: [0,0,0,6000, 5000, 4000],
+    paper_limit: [0,0,0,14, 12, 11],
+    cap: 'full',
+    minors: [
+        {name:'MS',cash:40, share_count:2, shares: {m0:'ss'}},
+        {name:'Big 4',cash:60, share_count:2, shares: {m1:'ss'}},
+    ],
+    share_co: [
+        {name:'TexMex'},
+        {name:'FCP'},
+        {name:'NdM'},
+        {name:'UdY'},
+        {name:'Mex'},
+        {name:'MexCentral'},
+        {name:'SoPac'},
+        {name:'Chihuahua'}
+    ],
+    shares: ['pssssssss'],
+    share_count: [10],
+    market: {
+        grid:[[0,10,20,30,40,50,60,70,80,90,100,112,124,137,150,185,195,212,230,250]],
+        ipo: [[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0]],
+    },
+    eat_comma: 0
+};

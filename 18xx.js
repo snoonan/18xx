@@ -364,10 +364,13 @@ function sr_ipo()
     new_share_co(new_co);
     new_co.shares[new_co.id] = co_shares;
     new_co.shares_pct[new_co.id] = 100;
-    transfer_share(game.share_co[game.share_co.length-1], game.players[game.sr_current], 'p', new_co.id, par);
     h = "IPO: -- "+new_co.name+" with "+s+" shares, par at $"+par+" by "+game.players[game.sr_current].name;
     if (game_cfg.cap == 'full') {
-        transfer_cash(game.market, new_co.id, par*new_co.share_count);
+        transfer_cash(game.players[game.sr_current], game.actors[new_co.id], par*share_value('p'));
+        transfer_cash(game.market, game.actors[new_co.id], par*(new_co.share_count-share_value('p')));
+        transfer_share(game.share_co[game.share_co.length-1], game.players[game.sr_current], 'p', new_co.id, 0);
+    } else {
+        transfer_share(game.share_co[game.share_co.length-1], game.players[game.sr_current], 'p', new_co.id, par);
     }
     $("#log_sr_"+game.turn_id).append($("<li/>", { class: 'log_action', html: h }));
     game.sr_passes = 0;
@@ -630,7 +633,7 @@ function sp_stock()
         log = '#log_sr_'+game.turn_id;
     }
     h = "Stock redistribution: -- ";
-    shares = $('#sp_share').val(),
+    shares = $('#sp_share').val();
     for(var share in shares) {
         transfer_share(
            game.actors[$('#sp_share_from').val()],
