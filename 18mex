@@ -2,6 +2,7 @@ var game_cfg = {
     player_start_cash: [0,0,0,625, 500, 450],
     bank: [0,0,0,6000, 5000, 4000],
     paper_limit: [0,0,0,19, 43, 11],
+    cap: 'partial',
     minors: [
         {name:'a Interoceanic',cash:0, share_count:2, shares: {m0:'ss'}},
         {name:'b Sonora-baja',cash:0, share_count:2, shares: {m1:'ss'}},
