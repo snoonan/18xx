@@ -1,3 +1,5 @@
+var game_cfg = {"ver":-1};
+
 var game  = {
     players: [],
     minors:  [],
@@ -108,10 +110,9 @@ function move_in_market(s,x,y)
 function new_share_co(s)
 {
     s.type = 's';
-    s.id = 's'+game.share_co.length;
     s.cash = +s.cash;
     game.share_co.push(s);
-    game.actors['s'+(game.share_co.length-1)] = game.share_co[game.share_co.length-1];
+    game.actors[s.id] = s; //game.share_co[game.share_co.length-1];
     for(var i in game_cfg.market.ipo) {
         var ipo = game_cfg.market.ipo[i];
         if (game_cfg.market.grid[ipo[1]][ipo[0]] == s.par) {
@@ -151,7 +152,7 @@ function new_share_co(s)
             "class": "co_"+s.share_count+"_stock "+s.id
     }).insertBefore("#market_income");
     // Remove from share_co_names
-    $(".share_co_names option .s_"+s.id).remove();
+    $(".share_co_names .s_"+s.id).remove();
     $(".or_actor_list").append("<option class='s_"+s.id+"' value="+s.id+">"+s.name+"</option>");
     $(".sr_co_list").append("<option class='s_"+s.id+"' value="+s.id+">"+s.name+"</option>");
     if (game_cfg.cap == 'partial') {
@@ -167,8 +168,15 @@ function startgame()
     $('#start').hide();
     $('#game_file').hide();
     document.title = $('#game_file').val();
-    $.getScript($('#game_file').val(), function(){
+    $.retrieveJSON($('#game_file').val(), function(json){
 
+    if (game.market.cash != 0) {
+        if (game_cfg.ver != json.ver) {
+            alert('Updated version available, refresh to restart and use.');
+        }
+        return; // Already got the cached version, ignore the new.
+    }
+    game_cfg = json;
     var c;
 
     for(var r in game_cfg.market.grid) {
@@ -203,7 +211,7 @@ function startgame()
         $(".ipo_shares").append("<option class='s_"+game_cfg.share_count+"' value="+c+">"+game_cfg.share_count+"</option>");
     }
     for(c in game_cfg.share_co) {
-        $(".share_co_names").append("<option class='s_"+game_cfg.share_co[c].name+"' value="+c+">"+game_cfg.share_co[c].name+"</option>");
+        $(".share_co_names").append("<option class='s_"+game_cfg.share_co[c].id+"' value="+c+">"+game_cfg.share_co[c].name+"</option>");
     }
     for(c in game.players) {
         game.players[c].cash = 0;
@@ -321,6 +329,7 @@ function transfer_share(from, to, share, share_of, price)
          (game_cfg.cap_float < 0 && from.shares[share_of].length <= -game_cfg.cap_float)
         )) {
         from.floated = true;
+        transfer_cash(game.market, game.actors[from.id], from.par*(from.share_count));
         $("."+from.id).removeClass('not_floated');
     }
     update_stock_ui(from);
@@ -372,18 +381,12 @@ function sr_ipo()
     s = 10;
     s_idx = 0;
     co_shares = game_cfg.shares[s_idx];
-    new_co = {name: game_cfg.share_co[n].name, cash: 0, par:par, stock:par, share_count: s, shares:{}, shares_pct: {}};
+    new_co = {name: game_cfg.share_co[n].name, id: game_cfg.share_co[n].id, cash: 0, par:par, stock:par, share_count: s, shares:{}, shares_pct: {}};
     new_share_co(new_co);
     new_co.shares[new_co.id] = co_shares;
     new_co.shares_pct[new_co.id] = 100;
     h = "IPO: -- "+new_co.name+" with "+s+" shares, par at $"+par+" by "+game.players[game.sr_current].name;
-    if (game_cfg.cap == 'full') {
-        transfer_cash(game.players[game.sr_current], game.actors[new_co.id], par*share_value('p'));
-        transfer_cash(game.market, game.actors[new_co.id], par*(new_co.share_count-share_value('p')));
-        transfer_share(game.share_co[game.share_co.length-1], game.players[game.sr_current], 'p', new_co.id, 0);
-    } else {
-        transfer_share(game.share_co[game.share_co.length-1], game.players[game.sr_current], 'p', new_co.id, par);
-    }
+    transfer_share(game.actors[new_co.id], game.players[game.sr_current], 'p', new_co.id, par);
     $("#log_sr_"+game.turn_id).append($("<li/>", { class: 'log_action', html: h }));
     game.sr_passes = 0;
 }
