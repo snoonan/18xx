@@ -23,7 +23,6 @@ function addplayer() {
     $( "<td/>", {
             html: name,
             id: p.id+"_name",
-            "class": "new",
     }).insertBefore("#Bank_actor");
     $( "<td/>", {
             html: '-',
@@ -124,37 +123,43 @@ function new_share_co(s)
     $( "<td/>", {
             html: s.name,
             id: s.id+"_name",
-            "class": "co_"+s.share_count+"_stock"
+            "class": "co_"+s.share_count+"_stock "+s.id
     }).insertBefore("#market_actor");
     $( "<td/>", {
             html: s.stock,
             id: s.id+"_valuation",
-            "class": "co_"+s.share_count+"_stock"
+            "class": "co_"+s.share_count+"_stock "+s.id
     }).insertBefore("#market_valuation");
     $( "<td/>", {
             html: s.par+":"+s.shares[s.id],
             id: s.id+"_stock",
-            "class": "co_"+s.share_count+"_stock"
+            "class": "co_"+s.share_count+"_stock "+s.id
     }).insertBefore("#market_stock");
     $( "<td/>", {
             html: 0,
             id: s.id+"_run",
-            "class": "co_"+s.share_count+"_stock"
+            "class": "co_"+s.share_count+"_stock "+s.id
     }).insertBefore("#market_run");
     $( "<td/>", {
             html: 0,
             id: s.id+"_cash",
-            "class": "co_"+s.share_count+"_stock"
+            "class": "co_"+s.share_count+"_stock "+s.id
     }).insertBefore("#market_cash");
     $( "<td/>", {
             html: "$<input size='3' id='"+s.id+"_in' value='0'>",
             id: s.id+"_income",
-            "class": "co_"+s.share_count+"_stock"
+            "class": "co_"+s.share_count+"_stock "+s.id
     }).insertBefore("#market_income");
     // Remove from share_co_names
     $(".share_co_names option .s_"+s.id).remove();
     $(".or_actor_list").append("<option class='s_"+s.id+"' value="+s.id+">"+s.name+"</option>");
     $(".sr_co_list").append("<option class='s_"+s.id+"' value="+s.id+">"+s.name+"</option>");
+    if (game_cfg.cap == 'partial') {
+        s.floated = true;
+    } else {
+        s.floated = false;
+        $("."+s.id).addClass('not_floated');
+    }
 }
 
 function startgame()
@@ -310,7 +315,14 @@ function transfer_share(from, to, share, share_of, price)
     from.shares[share_of] =
     from.shares[share_of].slice(0,share_idx) +
     from.shares[share_of].slice(share_idx+1,from.shares[share_of].length);
-    from.shares_pct[share_of] += (100/game.actors[share_of].share_count)*share_value(share);
+    from.shares_pct[share_of] -= (100/game.actors[share_of].share_count)*share_value(share);
+    if (game_cfg.cap == 'full' &&
+        ((game_cfg.cap_float > 0 && from.shares_pct[share_of] <= game_cfg.cap_float) ||
+         (game_cfg.cap_float < 0 && from.shares[share_of].length <= -game_cfg.cap_float)
+        )) {
+        from.floated = true;
+        $("."+from.id).removeClass('not_floated');
+    }
     update_stock_ui(from);
     if (from.hasOwnProperty('nw')) {
         player_nw(from);
@@ -510,8 +522,12 @@ function or_start()
         game.or_order.push(game.minors[m].id);
     }
     for(var i in game.or_sort) {
-        for(var s in game.or_order_market[game.or_sort[i][0]][game.or_sort[i][1]]) {
-            game.or_order.push(game.or_order_market[game.or_sort[i][0]][game.or_sort[i][1]][s]);
+        var sort = game.or_sort[i];
+        for(var s in game.or_order_market[sort[0]][sort[1]]) {
+            var co = game.or_order_market[sort[0]][sort[1]][s];
+            if (game.actors[co].floated) {
+                game.or_order.push(co);
+            }
         }
     }
     game.or_id ++;
@@ -638,7 +654,7 @@ function sp_stock()
         transfer_share(
            game.actors[$('#sp_share_from').val()],
            game.actors[$('#sp_share_to').val()],
-           share,
+           shares.charAt(share),
            $('#sp_share_co').val(),
            0);
     }

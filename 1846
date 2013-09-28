@@ -3,6 +3,7 @@ var game_cfg = {
     bank: [0,0,0,6500, 7500, 9000],
     paper_limit: [0,0,0,14, 12, 11],
     cap: 'full',
+    cap_float: 50,
     minors: [
         {name:'MS',cash:40, share_count:2, shares: {m0:'ss'}},
         {name:'Big 4',cash:60, share_count:2, shares: {m1:'ss'}},
