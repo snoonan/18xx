@@ -512,6 +512,11 @@ function or_pass()
        return;
     }
     game.or_actor = game.actors[game.or_order.shift()];
+    if ( game.or_order.length == 0) {
+        $('#or_pass').hide();
+        $('#or_nextsr').show();
+        $('#or_nextor').show();
+    }
     $("#current_co").text(game.or_actor.name);
 }
 
@@ -531,6 +536,9 @@ function or_start()
         }
     }
     game.or_id ++;
+    $('#or_pass').show();
+    $('#or_nextsr').hide();
+    $('#or_nextor').hide();
     $("#or_id").text('or'+game.turn_id+"."+game.or_id);
     $('.stock_rising').removeClass('stock_rising');
     $('.stock_falling').removeClass('stock_falling');
