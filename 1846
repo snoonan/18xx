@@ -3,11 +3,21 @@
     "player_start_cash": [0,0,0,400, 400, 400],
     "bank": [0,0,0,6500, 7500, 9000],
     "paper_limit": [0,0,0,14, 12, 11],
-    "cap": "full",
-    "cap_float": 50,
+    "co_limit": 60,
+    "cap": "inc",
+    "cap_float": 20,
+    "trains": {
+        "limit": [4,4,3,2],
+        "stock": [
+                   [[2],[80],5],
+                   [[4,"3/5"],[180,160],4],
+                   [[5,"4/6"],[500,450],3],
+                   [[6,"7/8"],[800,900],99]
+                 ]
+    },
     "minors": [
-        {"name":"MS","cash":40, "share_count":2, "shares": {"m0":"ss"}},
-        {"name":"Big 4","cash":60, "share_count":2, "shares": {"m1":"ss"}}
+        {"name":"MS","cash":60, "share_count":2, "shares": {"m0":"ss"}},
+        {"name":"Big 4","cash":40, "share_count":2, "shares": {"m1":"ss"}}
     ],
     "share_co": [
         {"name":"NYC",  "id":"s0"},
@@ -22,7 +32,13 @@
     "share_count": [10],
     "market": {
         "grid":[[0,10,20,30,40,50,60,70,80,90,100,112,124,137,150,185,195,212,230,250]],
-        "ipo": [[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0]]
+        "ipo": [[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[12,0],[13,0],[14,0]],
+        "limit": 50,
+        "order": "bs",
+        "sr_sell_pre": "if(is_president(co, player)) { left1(co); }",
+        "sr_end": "if_in_market(left1); if_soldout(right1);",
+        "operate": "if(!is_share_co(co)) { } else if (payout < share/2) { left1(co); } else if (payout < share) { } else if((payout >= share*3) && (share > 150)) { right3(co); } else if (payout >= share*2) { right2(co); } else if (payout >= share) { right1(co); } ",
+        "end_of_sr": ""
     },
     "eat_comma": 0
 }
