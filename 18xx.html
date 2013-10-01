@@ -6,8 +6,8 @@
 <body>
 <script src="jquery-2.0.3.js"></script>
 <script src="jquery.offline.js"></script>
-<div id="actors">
-<table id="actor" border="1">
+<span id="actors">
+<table id="actor" style="display:inline-block" border="1">
 <tr>
   <th><b>Name</b></th>
   <td id="Bank_actor">
@@ -32,11 +32,13 @@
   <td id="Bank_income" hidden>
 </tr>
 </table>
+<div id='game_start'>
 <input id="game_file" value='1846'>
 <button id='start' onClick="startgame()">Start</button>
 </div>
-<div id="market">
-<table id="co_actor" border="1">
+</span>
+<span id="market" hidden >
+<table id="co_actor" style="display:inline-block" border="1">
 <tr>
   <th><b>Company</b></th>
   <td id="market_actor" hidden>
@@ -58,17 +60,29 @@
   <td id="market_cash" hidden>
 </tr>
 <tr>
+  <th><b>Trains</b></th>
+  <td id="market_train" hidden>
+</tr>
+<tr>
   <th><b>Income</b></th>
   <td id="market_income" hidden>
 </tr>
 </table>
-</div>
-<div id="stock">
-<table id='stock_grid' border='1'>
+</span>
+<span id="trains" hidden >
+<table id='train_grid' style="display:inline-block" border='1'>
+<tr><td><b>Phase</b></td></tr>
+<tr><td><b>Count</b></td></tr>
+<tr><td><b>Speed</b></td></tr>
+<tr><td><b>Cost</b></td></tr>
 </table>
-</div>
-<div id="board">
-</div>
+</span>
+<span id="stock" hidden >
+<table id='stock_grid' style="display:inline-block" border='1'>
+</table>
+</span>
+<span id="board">
+</span>
 <div id="log">
 <ul id="log_turns" class="log_turns">
 </ul>
@@ -98,7 +112,7 @@
         <button onclick="or_operate()">Operate</button> for $<input width=2 id="or_run_value">, <select id="or_run_pay"><option value='full'>pay full</option><option value='half'>pay half</option><option value='hold'>hold</option></select>.<br>
       </li>
       <li>
-        <button onclick="or_pay()">Pay</button> $<input width=2 id="or_pay"> to <select class="or_actor_list" id="or_pay_to"><option value='b'>Bank</option></select> for <input id="or_pay_why">.<br>
+        <button onclick="or_pay()">Pay</button> $<input width=2 id="or_pay"> to <select class="or_actor_list" id="or_pay_to"><option value='Bank'>Bank</option></select> for <input id="or_pay_why">.<br>
       </li>
       <li>
         <button onclick="or_buy()">Buyback</button> $<input width=2 id="or_buy"> to buy back <input width=2 id="or_buy_shares"> shares back.<br>
@@ -116,10 +130,10 @@
 <div id="special_actions" hidden>
   <ul>
       <li>
-        <button onclick="sp_pay()">Pay</button> $<input width=2 id="sp_pay"> from <select class="or_actor_list" id="sp_pay_from"><option value='b'>Bank</option></select> to <select class="or_actor_list" id="sp_pay_to"><option value='b'>Bank</option></select> for <input id="sp_pay_why">.<br>
+        <button onclick="sp_pay()">Pay</button> $<input width=2 id="sp_pay"> from <select class="or_actor_list" id="sp_pay_from"><option value='Bank'>Bank</option></select> to <select class="or_actor_list" id="sp_pay_to"><option value='Bank'>Bank</option></select> for <input id="sp_pay_why">.<br>
       </li>
       <li>
-        <button onclick="sp_stock()">Stock</button> <input width=2 id="sp_share"> of <select class="sr_co_list" id="sp_share_co"></select> from <select class="or_actor_list" id="sp_share_from"><option value='b'>Bank</option></select> to <select class="or_actor_list" id="sp_share_to"><option value='b'>Bank</option></select> for <input id="sp_share_why">.<br>
+        <button onclick="sp_stock()">Stock</button> <input width=2 id="sp_share"> of <select class="sr_co_list" id="sp_share_co"></select> from <select class="or_actor_list" id="sp_share_from"><option value='Bank'>Bank</option></select> to <select class="or_actor_list" id="sp_share_to"><option value='Bank'>Bank</option></select> for <input id="sp_share_why">.<br>
       </li>
       <li>
         <button onclick="sp_stock_adj()">Revalue</button> <select class="sr_co_list" id="sp_adj_co"></select> move <select class="sp_move_list" id="sp_adj_move"><option value='1_0'>Right</option><option value='-1_0'>Left</option><option value='2_0'>Right 2</option><option value='3_0'>Right 3</option><option value='0_-1'>Up</option><option value='0_1'>Down</option></select> for <input id="sp_adj_why">.<br>

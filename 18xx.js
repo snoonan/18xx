@@ -78,6 +78,11 @@ function new_minor(m)
             "class": "co_minor",
     }).insertBefore("#market_cash");
     $( "<td/>", {
+            html: m.trains.join(','),
+            id: m.id+"_train",
+            "class": "co_minor",
+    }).insertBefore("#market_train");
+    $( "<td/>", {
             html: "-",
     }).insertBefore("#market_income");
     $(".or_actor_list").append("<option class='m_"+m.id+"' value="+m.id+">"+m.name+"</option>");
@@ -148,6 +153,11 @@ function new_share_co(s)
             "class": "co_"+s.share_count+"_stock "+s.id
     }).insertBefore("#market_cash");
     $( "<td/>", {
+            html: '',
+            id: s.id+"_train",
+            "class": "co_"+s.share_count+"_stock "+s.id
+    }).insertBefore("#market_train");
+    $( "<td/>", {
             html: "$<input size='3' id='"+s.id+"_in' value='0'>",
             id: s.id+"_income",
             "class": "co_"+s.share_count+"_stock "+s.id
@@ -166,8 +176,10 @@ function new_share_co(s)
 
 function startgame()
 {
-    $('#start').hide();
-    $('#game_file').hide();
+    $('#game_start').hide();
+    $('#trains').show();
+    $('#market').show();
+    $('#stock').show();
     document.title = $('#game_file').val();
     //$.retrieveJSON($('#game_file').val(), function(json){
     $.getJSON($('#game_file').val(), function(json){
@@ -186,6 +198,35 @@ function startgame()
             id: "sr_deal",
             "class": "deal"
             }));
+    var train;
+    var phase, count, speed, cost;
+
+    train=$('#train_grid').children().eq(0).children();
+    phase=train.eq(0);
+    count=train.eq(1);
+    speed=train.eq(2);
+    cost =train.eq(3);
+    for(var p in game_cfg.trains.stock) {
+        var stock = game_cfg.trains.stock[p];
+        phase.append($('<td/>', {colspan:stock[2].length,
+                    html: stock[0],
+                    class: 'phase_'+stock[0]
+        }));
+        count.append($('<td/>', {colspan:stock[2].length,
+                    html: stock[1],
+                    class: 'phase_'+stock[0]
+        }));
+        for(var t in stock[2]) {
+            speed.append($('<td/>', {
+                        html: stock[2][t][0],
+                        class: 'phase_'+stock[0]
+            }));
+            cost.append($('<td/>', {
+                        html: stock[2][t][1],
+                        class: 'phase_'+stock[0]
+            }));
+        }
+    }
     for(var r in game_cfg.market.grid) {
         var row;
         row = $("<tr/>");
@@ -227,6 +268,7 @@ function startgame()
     $("#Bank_actor").html('Bank');
     $('#Bank_cash').show();
     $('#Bank_stock').show();
+    game.actors['Bank'] = game.market;
     game.turn_id = 0;
     // Cache market operating order.
     game.or_sort = [];
@@ -299,7 +341,15 @@ function transfer_cash(from, to, cash)
   to.cash += cash;
   from.cash -= cash;
   $("#"+to.id+"_cash").text(to.cash);
+  $("#"+to.id+"_cash").removeClass("error");
+  if (to.cash < 0) {
+      $("#"+to.id+"_cash").addClass("error");
+  }
   $("#"+from.id+"_cash").text(from.cash);
+  $("#"+from.id+"_cash").removeClass("error");
+  if (from.cash < 0) {
+      $("#"+from.id+"_cash").addClass("error");
+  }
   if (to.hasOwnProperty("nw")) {
       to.nw += cash;
       $("#"+to.id+"_nw").text(to.nw);
@@ -308,6 +358,13 @@ function transfer_cash(from, to, cash)
       from.nw -= cash;
       $("#"+from.id+"_nw").text(from.nw);
   }
+}
+function swap_pres(from, to, of)
+{
+    transfer_share(from, to, 'p', of, 0);
+    transfer_share(to, from, 's', of, 0);
+    transfer_share(to, from, 's', of, 0);
+    game.actors[of].president = to;
 }
 // from, to  -- actors
 // share     -- what share (type)
@@ -357,16 +414,36 @@ function transfer_share(from, to, share, share_of, price)
 
 function update_stock_ui(actor)
 {
-  var h = '';
-  if (actor.type == 's')
+  var h = $('#'+actor.id+'_stock');
+  var paper = $('<div/>');
+  var paper_count = 0;
+
+  h.empty();
+  if (actor.type == 's' && actor.shares[actor.id].length != 0)
   {
-    h = "Par: "+actor.par+"<br>";
+    h.append($('<div/>', {html:"Par: "+actor.par}));
+  }
+  if (actor.type == 'p')
+  {
+    h.append(paper);
   }
   for(c in actor.shares) {
-     if (actor.shares[c].length == 0) { continue; }
-     h += game.actors[c].name+': '+actor.shares[c]+'<br>';
+    var l;
+    if (actor.shares[c].length == 0) { continue; }
+    l = $('<div/>', {html: game.actors[c].name+': '+actor.shares[c]});
+    paper_count += actor.shares[c].length;
+    if (actor.type == 'p' && actor.shares_pct[c] > game_cfg.co_limit) {
+        l.addClass("error");
+    }
+    h.append(l);
   }
-  $('#'+actor.id+'_stock').html(h);
+  if (actor.type == 'p')
+  {
+    paper.html('Paper: '+paper_count);
+    if (paper_count > game_cfg.paper_limit[game.players.length]) {
+        paper.addClass("error");
+    }
+  }
 }
 function sr_sell()
 {
@@ -488,6 +565,7 @@ function or_operate()
         var share = game.or_actor.stock;
         eval(game_cfg.market.operate);
     }
+    move_in_market(game.or_actor,0,0); // Move to end of list
     $('#'+game.or_actor.id+'_run').html($('#or_run_value').val());
     $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action special', html: h }));
 }
@@ -725,6 +803,10 @@ function sp_stock_adj()
 function left1(c)
 {
     left(c,1);
+}
+function stay(c)
+{
+    left(c,0);
 }
 function right1(c)
 {

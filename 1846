@@ -9,15 +9,15 @@
     "trains": {
         "limit": [4,4,3,2],
         "stock": [
-                   [[2],[80],5],
-                   [[4,"3/5"],[180,160],4],
-                   [[5,"4/6"],[500,450],3],
-                   [[6,"7/8"],[800,900],99]
+                   ["I"  ,5,  [[2,80]]],
+                   ["II" ,4,  [["3/5",160],[4,180]]],
+                   ["III",3,  [["4/6",450],[5,500]]],
+                   ["IV" ,99, [[6,800],["7/8",900]]]
                  ]
     },
     "minors": [
-        {"name":"MS","cash":60, "share_count":2, "shares": {"m0":"ss"}},
-        {"name":"Big 4","cash":40, "share_count":2, "shares": {"m1":"ss"}}
+        {"name":"MS","cash":60, "share_count":2, "shares": {"m0":"ss"}, "trains": [2]},
+        {"name":"Big 4","cash":40, "share_count":2, "shares": {"m1":"ss"}, "trains": [2]}
     ],
     "share_co": [
         {"name":"NYC",  "id":"s0"},
@@ -37,7 +37,7 @@
         "order": "bs",
         "sr_sell_pre": "if(is_president(co, player)) { left1(co); }",
         "sr_end": "if_in_market(left1); if_soldout(right1);",
-        "operate": "if(!is_share_co(co)) { } else if (payout < share/2) { left1(co); } else if (payout < share) { } else if((payout >= share*3) && (share > 150)) { right3(co); } else if (payout >= share*2) { right2(co); } else if (payout >= share) { right1(co); } ",
+        "operate": "if(!is_share_co(co)) { } else if (payout < share/2) { left1(co); } else if (payout < share) { stay(co); } else if((payout >= share*3) && (share > 150)) { right3(co); } else if (payout >= share*2) { right2(co); } else if (payout >= share) { right1(co); } ",
         "end_of_sr": ""
     },
     "eat_comma": 0
