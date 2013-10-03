@@ -198,6 +198,11 @@ function startgame()
     game_cfg = json;
     var c;
 
+    if (game_cfg.market.hasOwnProperty('pre_start')) {
+        // Something special at start of game.
+        var num_players = game.players.length;
+        eval(game_cfg.market.pre_start);
+    }
     $('#p0_name').append($('<div/>', {
             html: 'Deal',
             id: "sr_deal",
@@ -309,7 +314,8 @@ function startgame()
             }
         } while(max[0] != 99);
     }
-    sr_start();
+    $('#pre_start').show();
+    $("#special_actions").show();
 }});
 }
 
@@ -532,6 +538,7 @@ function sr_start()
     $("#sr_id").text('sr'+game.turn_id);
     sr_pass();
     sr_log();
+    $('#pre_start').hide();
     $('#actions>div').hide();
     $("#sr_actions").show();
     $("#special_actions").show();
@@ -618,6 +625,21 @@ function or_sell()
     }
     h += game.or_actor.name+" was payed $"+$('#or_sell').val();
     h += " for "+shares+" of stock into the market.";
+
+    $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action special', html: h }));
+}
+
+function or_train()
+{
+    var h, train, from, price;
+    h = "Buy Train: -- ";
+    train = $('#or_train').val();
+    from = $('#or_train_from').val();
+    price = +$('#or_train_price').val();
+    transfer_train(game.actors[from], game.or_actor, price);
+    h += game.or_actor.name+" payed $"+price;
+    h += ' to '+game.actors[from].name;
+    h += " for "+train+" train.";
 
     $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action special', html: h }));
 }
