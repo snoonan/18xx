@@ -36,7 +36,7 @@ game_data({
         "limit": 50,
         "order": "bs",
         "sr_sell_pre": "if(is_president(co, player)) { left1(co); }",
-        "sr_end": "if_in_market(left1); if_soldout(right1);",
+        "sr_end": "each_in_market(left1); each_soldout(right1);",
         "operate": "if(!is_share_co(co)) { } else if (payout < share/2) { left1(co); } else if (payout < share) { stay(co); } else if((payout >= share*3) && (share > 150)) { right3(co); } else if (payout >= share*2) { right2(co); } else if (payout >= share) { right1(co); } ",
         "end_of_sr": ""
     },
