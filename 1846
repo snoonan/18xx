@@ -16,8 +16,8 @@ game_data({
                  ]
     },
     "minors": [
-        {"name":"MS","cash":60, "share_count":2, "shares": {"m0":"ss"}, "trains": [2]},
-        {"name":"Big 4","cash":40, "share_count":2, "shares": {"m1":"ss"}, "trains": [2]}
+        {"name":"MS","cash":60, "share_count":4, "shares": {"m0":"pd"}, "trains": [2]},
+        {"name":"Big 4","cash":40, "share_count":4, "shares": {"m1":"pd"}, "trains": [2]}
     ],
     "share_co": [
         {"name":"NYC",  "id":"s0"},

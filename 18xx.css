@@ -39,8 +39,11 @@
     color:blue;
 }
 .not_floated {
-    background:yellow;
+    color:yellow;
+}
+.has_run {
+    color:grey;
 }
 .error {
-    color:red
+    color:red;
 }
