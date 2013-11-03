@@ -7,7 +7,7 @@
 <script src="jquery-2.0.3.js"></script>
 <script src="jquery.offline.js"></script>
 <span id="actors">
-<table id="actor" style="display:inline-block" border="1">
+<table id="actor" style="float:left" border="1">
 <tr>
   <th><b>Name</b></th>
   <td id="Bank_actor">
@@ -32,13 +32,9 @@
   <td id="Bank_income" hidden>
 </tr>
 </table>
-<div id='game_start'>
-<input id="game_file" value='1846'>
-<button id='start' onClick="startgame()">Start</button>
-</div>
 </span>
 <span id="market" hidden >
-<table id="co_actor" style="display:inline-block" border="1">
+<table id="co_actor" style="float:left" border="1">
 <tr>
   <th><b>Company</b></th>
   <td id="market_actor" hidden>
@@ -59,7 +55,7 @@
   <th><b>Cash</b></th>
   <td id="market_cash" hidden>
 </tr>
-<tr>
+<tr class="trains">
   <th><b>Trains</b></th>
   <td id="market_train" hidden>
 </tr>
@@ -69,8 +65,8 @@
 </tr>
 </table>
 </span>
-<span id="trains" hidden >
-<table id='train_grid' style="display:inline-block" border='1'>
+<span id="trains" class="trains" hidden >
+<table id='train_grid' style="float:left" border='1'>
 <tr><td><b>Phase</b></td></tr>
 <tr><td><b>Count</b></td></tr>
 <tr><td><b>Speed</b></td></tr>
@@ -78,7 +74,7 @@
 </table>
 </span>
 <span id="stock" hidden >
-<table id='stock_grid' style="display:inline-block" border='1'>
+<table id='stock_grid' border='1'>
 </table>
 </span>
 <span id="board">
@@ -86,6 +82,10 @@
 <div id="log">
 <ul id="log_turns" class="log_turns">
 </ul>
+</div>
+<div id='game_start'>
+<input id="game_file" value='1846'>
+<button id='start' onClick="startgame()">Start</button>
 </div>
 <div id="actions">
 <div id="sr_actions" hidden>

@@ -23,22 +23,23 @@
     cursor: pointer;
 }
 .ipo {
-    border-color:red
+    border-color:red;
+    border-width: 3;
 }
 .red {
-    background:red
+    background:red;
 }
 .yellow {
-    background:yellow
+    background:yellow;
 }
 .stock_rising {
-    color:green
+    color:green;
 }
 .stock_falling {
-    color:blue
+    color:blue;
 }
 .not_floated {
-    background:yellow
+    background:yellow;
 }
 .error {
     color:red

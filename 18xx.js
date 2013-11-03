@@ -77,11 +77,13 @@ function new_minor(m)
             id: m.id+"_cash",
             "class": "co_minor",
     }).insertBefore("#market_cash");
-    $( "<td/>", {
-            html: m.trains.join(','),
-            id: m.id+"_train",
-            "class": "co_minor",
-    }).insertBefore("#market_train");
+    if (game_cfg.hasOwnProperty('trains')) {
+        $( "<td/>", {
+                html: m.trains.join(','),
+                id: m.id+"_train",
+                "class": "co_minor",
+        }).insertBefore("#market_train");
+    }
     $( "<td/>", {
             html: "-",
     }).insertBefore("#market_income");
@@ -177,12 +179,15 @@ function new_share_co(s)
 function startgame()
 {
     $('#game_start').hide();
-    $('#trains').show();
     $('#market').show();
     $('#stock').show();
     document.title = $('#game_file').val();
     //$.retrieveJSON($('#game_file').val(), function(json){
-    $.getJSON($('#game_file').val(), function(json){
+    $.ajax({
+           dataType: "jsonp",
+           url: $('#game_file').val(),
+           jsonpCallback: 'game_data',
+           success: function(json){
 
     if (game.market.cash != 0) {
         if (game_cfg.ver != json.ver) {
@@ -201,30 +206,34 @@ function startgame()
     var train;
     var phase, count, speed, cost;
 
-    train=$('#train_grid').children().eq(0).children();
-    phase=train.eq(0);
-    count=train.eq(1);
-    speed=train.eq(2);
-    cost =train.eq(3);
-    for(var p in game_cfg.trains.stock) {
-        var stock = game_cfg.trains.stock[p];
-        phase.append($('<td/>', {colspan:stock[2].length,
-                    html: stock[0],
-                    class: 'phase_'+stock[0]
-        }));
-        count.append($('<td/>', {colspan:stock[2].length,
-                    html: stock[1],
-                    class: 'phase_'+stock[0]
-        }));
-        for(var t in stock[2]) {
-            speed.append($('<td/>', {
-                        html: stock[2][t][0],
+    $('.trains').hide();
+    if (game_cfg.hasOwnProperty('trains')) {
+        $('.trains').show();
+        train=$('#train_grid').children().eq(0).children();
+        phase=train.eq(0);
+        count=train.eq(1);
+        speed=train.eq(2);
+        cost =train.eq(3);
+        for(var p in game_cfg.trains.stock) {
+            var stock = game_cfg.trains.stock[p];
+            phase.append($('<td/>', {colspan:stock[2].length,
+                        html: stock[0],
                         class: 'phase_'+stock[0]
             }));
-            cost.append($('<td/>', {
-                        html: stock[2][t][1],
+            count.append($('<td/>', {colspan:stock[2].length,
+                        html: stock[1],
                         class: 'phase_'+stock[0]
             }));
+            for(var t in stock[2]) {
+                speed.append($('<td/>', {
+                            html: stock[2][t][0],
+                            class: 'phase_'+stock[0]
+                }));
+                cost.append($('<td/>', {
+                            html: stock[2][t][1],
+                            class: 'phase_'+stock[0]
+                }));
+            }
         }
     }
     for(var r in game_cfg.market.grid) {
@@ -301,7 +310,7 @@ function startgame()
         } while(max[0] != 99);
     }
     sr_start();
-});
+}});
 }
 
 function share_type(share_type)
