@@ -50,7 +50,6 @@ function new_minor(m)
     m.type = 'm';
     m.id = 'm'+game.minors.length;
     m.cash = +m.cash;
-    m.trains = [];
     m.stock = 0;
     m.shares_pct = [];
     m.shares_pct[m.id] =  100;
@@ -228,6 +227,7 @@ function startgame()
         count=train.eq(1);
         speed=train.eq(2);
         cost =train.eq(3);
+        $("#or_train_cost").html(game_cfg.trains.stock[0][2][0][1]);
         for(var p in game_cfg.trains.stock) {
             var stock = game_cfg.trains.stock[p];
             phase.append($('<td/>', {colspan:stock[2].length,
@@ -236,7 +236,8 @@ function startgame()
             }));
             count.append($('<td/>', {colspan:stock[2].length,
                         html: stock[1],
-                        class: 'phase_'+stock[0]
+                        class: 'phase_'+stock[0],
+                        id: 'train_'+stock[0]+'_count'
             }));
             for(var t in stock[2]) {
                 speed.append($('<td/>', {
@@ -247,6 +248,8 @@ function startgame()
                             html: stock[2][t][1],
                             class: 'phase_'+stock[0]
                 }));
+
+                $(".train_types").append("<option class='phase_"+stock[0]+"' value="+stock[2][t][0]+'_'+p+">"+stock[2][t][0]+' $'+stock[2][t][1]+"</option>");
             }
         }
     }
@@ -421,6 +424,7 @@ function transfer_share(from, to, shares, share_of, price, why)
         alert("Shares not available: "+skipped);
     }
 
+    to.shares[share_of] = to.shares[share_of].split('').sort(function(a,b){return share_value(b)-share_value(a);}).join('');
     from.shares_pct[share_of] -= (100/game.actors[share_of].share_count)*value;
     to.shares_pct[share_of] += (100/game.actors[share_of].share_count)*value;
     if (share == 'p') {
@@ -459,6 +463,29 @@ function transfer_share(from, to, shares, share_of, price, why)
     }
     l+=" for "+why;
     log_entry(l);
+}
+
+function transfer_train(from, to, train, price)
+{
+    var has_train = false;
+    train = train.split('_');
+
+    if (from == game.market) {
+        if (game_cfg.trains.stock[train[1]][1] == 0) {
+            return;
+        }
+        game_cfg.trains.stock[train[1]][1] -= 1;
+    } else {
+        $.grep(game.or_order, function(v) { if (v == train[0]) { has_train = true; } return v != train[0]; });
+        if (has_train == false) {
+            return;
+        }
+    }
+    transfer_cash(to, from, price);
+    to.trains.push(train[0]);
+    to.trains.sort();
+    update_train_ui(from);
+    update_train_ui(to);
 }
 
 function sr_sell()
@@ -527,7 +554,7 @@ function sr_start()
 {
     if(game.turn_id == 0) {
         // first turn of game, remove minors from sr_co_list
-        $('.sr_co_list').children().remove();
+        $('.sr_co_list').children().not('.Bank').remove();
     }
     game.turn_id ++;
     game.sr_current = -1;
@@ -615,13 +642,13 @@ function or_train()
 {
     var h, train, from, price;
     h = "Buy Train: -- ";
-    train = $('#or_train').val();
+    train = $('#or_train_type').val();
     from = $('#or_train_from').val();
-    price = +$('#or_train_price').val();
-    transfer_train(game.actors[from], game.or_actor, price);
+    price = +$('#or_train_cost').val();
+    transfer_train(game.actors[from], game.or_actor, train, price);
     h += game.or_actor.name+" payed $"+price;
     h += ' to '+game.actors[from].name;
-    h += " for "+train+" train.";
+    h += " for "+train.split('_')[0]+" train.";
 
     $("#log_or_"+game.turn_id+"_"+game.or_id).append($("<li/>", { class: 'log_action special', html: h }));
 }
@@ -729,6 +756,19 @@ function update_stock_ui(actor)
     if (paper_count > game_cfg.paper_limit[game.players.length]) {
         paper.addClass("error");
     }
+  }
+}
+
+function update_train_ui(actor)
+{
+  if (actor == game.market) {
+        for(var p in game_cfg.trains.stock) {
+            var stock = game_cfg.trains.stock[p];
+            $('#train_'+stock[0]+'_count').html(stock[1]);
+        }
+  } else {
+      var h = $('#'+actor.id+'_train');
+      h.html(actor.trains.join(','));
   }
 }
 
